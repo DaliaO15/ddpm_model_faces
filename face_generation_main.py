@@ -273,7 +273,11 @@ def train_loop(config, model, noise_scheduler, optimizer, train_dataloader, lr_s
     with open(os.path.join(losses_folder,"eval_losses.json"), "w") as f:
         json.dump(eval_losses_per_epoch, f)
 
-
+# TODO: 
+# 1. Increase the size of the validation data and the number of epochs
+# 2. Implement FID metric
+# 3. Implement EMA to generate better samples  
+    # ? How do I do this? 
 
 if __name__ == "__main__":
 

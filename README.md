@@ -40,7 +40,7 @@ cd ddpm_model_faces
 python training.py --config config.py
 ```
 
-### Generate samples
+### 4. Generate samples
 
 [//]: # (Comment: add a inference module)
 
@@ -50,7 +50,7 @@ The model was trained on FairFAce at 128x128 resolution. Below are samples gener
 
 [//]: # (Comment: add an image)
 
-### TODO / Future Work
+## TODO / Future Work
 
 - Train on higher-resolution datasets or implement something to improve the resolution of the images in the training data as well as in the inference images
 - Integrate classifier-free guidance for conditional generation
