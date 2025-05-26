@@ -26,8 +26,8 @@ from torch.utils.tensorboard import SummaryWriter
 # ----------------------
 
 config = utils.TrainingConfig()
-run_name = "tes1"
-config.num_epochs = 5
+run_name = "full_data_ema"
+config.num_epochs = 100
 
 # For the board
 writer = SummaryWriter(os.path.join(config.output_dir, os.path.join("tensorboard", run_name))) # initate tensorboard
@@ -37,16 +37,17 @@ writer = SummaryWriter(os.path.join(config.output_dir, os.path.join("tensorboard
 
 config.dataset_name = "HuggingFaceM4/FairFace"
 
-big_train_dataset = load_dataset(config.dataset_name, "0.25", split="train")
-big_valid_dataset = load_dataset(config.dataset_name, "0.25", split="validation")
+train_dataset = load_dataset(config.dataset_name, "0.25", split="train")
+valid_dataset = load_dataset(config.dataset_name, "0.25", split="validation")
 
 # ------------------ Making a small dataset for testing
 
-small_ds = big_valid_dataset.train_test_split(test_size=0.2,seed=123,stratify_by_column="race",)
+#small_ds = big_valid_dataset.train_test_split(test_size=0.2,seed=123,stratify_by_column="race",)
 #small_ds = small_ds["train"].train_test_split(test_size=0.2,seed=123,stratify_by_column="race",)
 
-train_dataset = small_ds["train"]
-valid_dataset = small_ds["test"]
+
+#train_dataset = small_ds["train"]
+#valid_dataset = small_ds["test"]
 
 print(f"The small training dataset has {train_dataset.shape[0]} instances.")
 print(f"The small validation dataset has {valid_dataset.shape[0]} instances.")
