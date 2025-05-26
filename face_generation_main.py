@@ -276,6 +276,7 @@ def train_loop(config, model, noise_scheduler, optimizer, train_dataloader, lr_s
 # TODO: 
 # 1. Increase the size of the validation data and the number of epochs
 # 2. Implement FID metric
+    # ! This is not possible to do at this stage because I would need to generate at least 10k samples every now and then
 # 3. Implement EMA to generate better samples  
     # ? How do I do this? 
 
