@@ -3,11 +3,16 @@
 This project implements a Denoising Diffusion Probabilistic Model (DDPM) to generate realistic human faces from noise. This implementation demonstrates my understanding of modern generative modeling techniques, PyTorch, and deep learning workflows.
 
 ## Highlights 
-- Implements a DDPM from scratch using PyTorch and Accelerate
-- Trained on a unbiased dataset of human faces (FairFace)
-- Includes training and evaluation loops, noise scheduling, sampling steps and model monitoring. 
-- Generates diverse and realistic human faces from pure noise
-- Modular and extensible codebase for experimentation
+* Implements a DDPM from scratch using PyTorch and Accelerate
+* Trained on a unbiased dataset of human faces (FairFace)
+* Includes:
+  * training and evaluation loops
+  * noise scheduling
+  * sampling steps
+  * exponential mean average (EMA) for evaluation and sampling 
+  * model monitoring with tensorboards
+* Generates diverse and realistic human faces from pure noise
+* Modular and extensible codebase for experimentation
 
 ## Repository Structure
 
@@ -37,8 +42,9 @@ cd ddpm_model_faces
 
 ### 3. Train the model
 ```
-python training.py --config config.py
+python Code/face_generation_main.py
 ```
+[//]: # (Comment: add screenshot of the tensorboard)
 
 ### 4. Generate samples
 
@@ -50,7 +56,7 @@ The model was trained on FairFAce at 128x128 resolution. Below are samples gener
 
 [//]: # (Comment: add an image)
 
-## TODO / Future Work
+## Future Work
 
 - Train on higher-resolution datasets or implement something to improve the resolution of the images in the training data as well as in the inference images
 - Integrate classifier-free guidance for conditional generation
