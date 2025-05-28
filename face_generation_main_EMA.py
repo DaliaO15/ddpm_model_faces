@@ -10,17 +10,13 @@ import os
 import json
 from PIL import Image
 import time
-
 # For data processing
 from torchvision import transforms
 from torchvision.utils import make_grid
 import torch
 import gc 
-
 # Import some classes
 import utils
-
-
 # To track the losses 
 from torch.utils.tensorboard import SummaryWriter
 
@@ -28,7 +24,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 config = utils.TrainingConfig()
 run_name = "full_data_ema_v2"
-config.num_epochs = 1
+config.num_epochs = 100
 
 
 # For the board
@@ -39,17 +35,17 @@ writer = SummaryWriter(os.path.join(config.output_dir, os.path.join("tensorboard
 
 config.dataset_name = "HuggingFaceM4/FairFace"
 
-big_train_dataset = load_dataset(config.dataset_name, "0.25", split="train")
-big_valid_dataset = load_dataset(config.dataset_name, "0.25", split="validation")
+train_dataset = load_dataset(config.dataset_name, "0.25", split="train")
+valid_dataset = load_dataset(config.dataset_name, "0.25", split="validation")
 
 # ------------------ Making a small dataset for testing
 
-small_ds = big_valid_dataset.train_test_split(test_size=0.2,seed=123,stratify_by_column="race",)
-small_ds = small_ds["train"].train_test_split(test_size=0.2,seed=123,stratify_by_column="race",)
+#small_ds = big_valid_dataset.train_test_split(test_size=0.2,seed=123,stratify_by_column="race",)
+#small_ds = small_ds["train"].train_test_split(test_size=0.2,seed=123,stratify_by_column="race",)
 
 
-train_dataset = small_ds["train"]
-valid_dataset = small_ds["test"]
+#train_dataset = small_ds["train"]
+#valid_dataset = small_ds["test"]
 
 print(f"The small training dataset has {train_dataset.shape[0]} instances.")
 print(f"The small validation dataset has {valid_dataset.shape[0]} instances.")
@@ -59,7 +55,6 @@ print(f"The small validation dataset has {valid_dataset.shape[0]} instances.")
 
 # Note: It may be a good idea to implement something to improve the quality of the images
 
-
 train_dataset.set_transform(lambda examples: utils.transform_examples(examples, config.image_size))
 valid_dataset.set_transform(lambda examples: utils.transform_examples(examples, config.image_size))
 
@@ -67,9 +62,7 @@ valid_dataset.set_transform(lambda examples: utils.transform_examples(examples, 
 train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=config.train_batch_size, shuffle=True)
 val_dataloader = torch.utils.data.DataLoader(valid_dataset, batch_size=config.eval_batch_size, shuffle=False)
 
-
 # ------------------ Define the difussion model
-
 
 from diffusers import UNet2DModel
 
@@ -104,18 +97,13 @@ from diffusers import DDPMScheduler # For the noise scheduler
 from diffusers.optimization import get_cosine_schedule_with_warmup # for the learning rate
 from diffusers import DDPMPipeline
 from diffusers.training_utils import EMAModel # >>> EMA: added import
-
-
 import torch.nn.functional as F # To compute the loss
-
 # For training
 from accelerate import Accelerator
 from accelerate.utils import ProjectConfiguration
 from huggingface_hub import create_repo, upload_folder
-
 from tqdm.auto import tqdm
 from pathlib import Path
-
 
 
 noise_scheduler = DDPMScheduler(num_train_timesteps=1000)
@@ -128,7 +116,6 @@ lr_scheduler = get_cosine_schedule_with_warmup(
     num_training_steps=(len(train_dataloader) * config.num_epochs))
 
 early_stopper = utils.EarlyStopping(patience=config.early_stopping_patience, min_delta=config.early_stopping_min_delta)
-
 
 
 def train_loop(config, model, noise_scheduler, optimizer, train_dataloader, lr_scheduler, val_dataloader, run_name):# earystopper):
@@ -151,22 +138,16 @@ def train_loop(config, model, noise_scheduler, optimizer, train_dataloader, lr_s
             os.makedirs(config.output_dir, exist_ok=True)
         accelerator.init_trackers(run_name)
 
-    # >>> EMA: Initialize EMA model
+    # EMA: Initialize EMA model
     ema_model = EMAModel(model.parameters(), power=0.9999)
     ema_model.to(accelerator.device)
     
-
     # Prepare everything
     # There is no specific order to remember, you just need to unpack the
     # objects in the same order you gave them to the prepare method.
     model, optimizer, train_dataloader, lr_scheduler, val_dataloader = accelerator.prepare(
         model, optimizer, train_dataloader, lr_scheduler, val_dataloader
     )
-
-    # >>> EMA: Initialize EMA model
-    ema_model = EMAModel(model.parameters(), power=0.9999)
-    ema_model.to(accelerator.device)
-
 
     global_step = 0
     train_losses_per_epoch = []
@@ -206,7 +187,7 @@ def train_loop(config, model, noise_scheduler, optimizer, train_dataloader, lr_s
                 lr_scheduler.step()
                 optimizer.zero_grad()
 
-                 # >>> EMA: update EMA model
+                 # EMA: update EMA model
                 ema_model.step(model)
 
             progress_bar.update(1)
@@ -228,11 +209,10 @@ def train_loop(config, model, noise_scheduler, optimizer, train_dataloader, lr_s
         
         # ------ Evaluation section
         
-       
         epoch_eval_loss = 0.0
         num_eval_batches = 0
 
-        # >>> EMA: store current model params and apply EMA weights
+        # EMA: store current model params and apply EMA weights
         ema_model.store(model.parameters()) # Saves the current parameters for restoring later.
         ema_model.copy_to(model.parameters()) # Copy current averaged parameters into given collection of parameters
         model.eval()
@@ -318,9 +298,9 @@ def train_loop(config, model, noise_scheduler, optimizer, train_dataloader, lr_s
     with open(os.path.join(losses_folder,"eval_losses.json"), "w") as f:
         json.dump(eval_losses_per_epoch, f)
 
-    print(f"Run EMA model\n on project {run_name}\
-          with train size {train_dataset.shape[0]} and val size {valid_dataset.shape[0]} \
-            number of epochs {config.num_epochs}")
+print(f"Run EMA model\n on project {run_name}\
+        with train size {train_dataset.shape[0]} and val size {valid_dataset.shape[0]} \
+        number of epochs {config.num_epochs}")
 
 # TODO: 
 # 1. Increase the size of the validation data and the number of epochs

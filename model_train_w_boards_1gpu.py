@@ -58,8 +58,8 @@ config = TrainingConfig()
 
 
 # For tests -- comment out later
-config.num_epochs = 50
-run_name = "full_data"
+config.num_epochs = 100
+run_name = "full_data_v2"
 
 writer = SummaryWriter(os.path.join(config.output_dir, os.path.join("tensorboard", run_name))) # initate tensorboard
 
@@ -76,7 +76,7 @@ valid_dataset = load_dataset(config.dataset_name, "0.25", split="validation")
 # ------------------ Making a small dataset for testing
 
 
-#small_ds = big_train_dataset.train_test_split(test_size=0.5,seed=123,stratify_by_column="race",)
+#small_ds = big_valid_dataset.train_test_split(test_size=0.2,seed=123,stratify_by_column="race",)
 #small_ds = small_ds["train"].train_test_split(test_size=0.2,seed=123,stratify_by_column="race",)
 
 #train_dataset = small_ds["train"]
@@ -382,7 +382,12 @@ def train_loop(config, model, noise_scheduler, optimizer, train_dataloader, lr_s
     with open(os.path.join(losses_folder,"eval_losses.json"), "w") as f:
         json.dump(eval_losses_per_epoch, f)
 
-
+try:
+    print(f"Run normal model\n on project {run_name}\
+        with train size {train_dataset.shape[0]} and val size {valid_dataset.shape[0]} \
+        number of epochs {config.num_epochs}")
+except:
+    print("Couldn't print run info")
 
 if __name__ == "__main__":
 

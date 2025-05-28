@@ -26,7 +26,7 @@ from torch.utils.tensorboard import SummaryWriter
 # ----------------------
 
 config = utils.TrainingConfig()
-run_name = "full_data_ema"
+run_name = "unknown"#"full_data_ema"
 config.num_epochs = 100
 
 # For the board
