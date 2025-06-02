@@ -2,3 +2,6 @@ test_name   time    epoch   train_size  val_size
 test3   4966    18  8763    2191
 train_data30    32377.16    33  34697   8675 ##Dividi el training data en dos y de ahi otra vez en training and testing
 full_data   84888   49              ## Entrene el baseline con todos los datos
+
+full_data_v2   92443.89  39 86744   10954 ##Entrene el baseline con todos los datos
+full_data_ema_v2    49  86744   10954 ## Face generation with EMA implementation

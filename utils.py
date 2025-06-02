@@ -18,7 +18,7 @@ from torch.utils.tensorboard import SummaryWriter
 @dataclass
 class TrainingConfig:
     image_size = 128  # the generated image resolution
-    train_batch_size = 16
+    train_batch_size = 32
     eval_batch_size = 16  # how many images to sample during evaluation
     num_epochs = 5
     gradient_accumulation_steps = 1

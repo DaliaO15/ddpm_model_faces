@@ -23,8 +23,9 @@ from torch.utils.tensorboard import SummaryWriter
 # ----------------------
 
 config = utils.TrainingConfig()
-run_name = "full_data_ema_v2"
-config.num_epochs = 100
+#run_name = "full_data_ema_v2"
+run_name = "test1"
+config.num_epochs = 1
 
 
 # For the board
@@ -94,6 +95,7 @@ model = UNet2DModel(
 # ------------------ Define noisy scheduler
 
 from diffusers import DDPMScheduler # For the noise scheduler
+from diffusers import DDIMScheduler
 from diffusers.optimization import get_cosine_schedule_with_warmup # for the learning rate
 from diffusers import DDPMPipeline
 from diffusers.training_utils import EMAModel # >>> EMA: added import
@@ -106,7 +108,9 @@ from tqdm.auto import tqdm
 from pathlib import Path
 
 
-noise_scheduler = DDPMScheduler(num_train_timesteps=1000)
+
+#noise_scheduler = DDPMScheduler(num_train_timesteps=1000)
+noise_scheduler = DDPMScheduler(num_train_timesteps=1000, beta_schedule="squaredcos_cap_v2")
 
 optimizer = torch.optim.AdamW(model.parameters(), lr=config.learning_rate)
 
@@ -251,8 +255,14 @@ def train_loop(config, model, noise_scheduler, optimizer, train_dataloader, lr_s
             ema_model.copy_to(model.parameters())
 
             if (epoch + 1) % config.save_image_epochs == 0 or epoch == config.num_epochs - 1:
+                #ddim_scheduler = DDIMScheduler.from_config(noise_scheduler.config) # Added for faster sampling
+                #pipeline = DDPMPipeline(unet=accelerator.unwrap_model(model), scheduler=ddim_scheduler)
+                
                 # Defer pipeline creation until needed
                 pipeline = DDPMPipeline(unet=accelerator.unwrap_model(model), scheduler=noise_scheduler)
+                
+
+                # TODO: Add a toggle to evaluate with DDIM
                 utils.evaluate(config, epoch, pipeline, run_name)
 
                 # Explicitly delete pipeline to free memory
@@ -315,6 +325,10 @@ if __name__ == "__main__":
     start_time = time.time()
 
     train_loop(config, model, noise_scheduler, optimizer, train_dataloader, lr_scheduler, val_dataloader, run_name)#, early_stopper)
+    
+    print(f"\n ***** Run EMA model on project {run_name}\n\
+        with train size {train_dataset.shape[0]} and val size {valid_dataset.shape[0]}\n \
+        number of epochs {config.num_epochs}")
     
     torch.cuda.synchronize()
     print(f"Training time: {(time.time() - start_time):.2f} seconds")
