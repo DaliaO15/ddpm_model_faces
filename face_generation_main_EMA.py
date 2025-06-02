@@ -23,9 +23,9 @@ from torch.utils.tensorboard import SummaryWriter
 # ----------------------
 
 config = utils.TrainingConfig()
-#run_name = "full_data_ema_v2"
-run_name = "test1"
-config.num_epochs = 1
+run_name = "full_data_ema_cosbeta_ddim"
+#run_name = "test1"
+config.num_epochs = 100
 
 
 # For the board
@@ -255,11 +255,11 @@ def train_loop(config, model, noise_scheduler, optimizer, train_dataloader, lr_s
             ema_model.copy_to(model.parameters())
 
             if (epoch + 1) % config.save_image_epochs == 0 or epoch == config.num_epochs - 1:
-                #ddim_scheduler = DDIMScheduler.from_config(noise_scheduler.config) # Added for faster sampling
-                #pipeline = DDPMPipeline(unet=accelerator.unwrap_model(model), scheduler=ddim_scheduler)
+                ddim_scheduler = DDIMScheduler.from_config(noise_scheduler.config) # Added for faster sampling
+                pipeline = DDPMPipeline(unet=accelerator.unwrap_model(model), scheduler=ddim_scheduler)
                 
                 # Defer pipeline creation until needed
-                pipeline = DDPMPipeline(unet=accelerator.unwrap_model(model), scheduler=noise_scheduler)
+                #pipeline = DDPMPipeline(unet=accelerator.unwrap_model(model), scheduler=noise_scheduler)
                 
 
                 # TODO: Add a toggle to evaluate with DDIM
@@ -312,12 +312,6 @@ print(f"Run EMA model\n on project {run_name}\
         with train size {train_dataset.shape[0]} and val size {valid_dataset.shape[0]} \
         number of epochs {config.num_epochs}")
 
-# TODO: 
-# 1. Increase the size of the validation data and the number of epochs
-# 2. Implement FID metric
-    # ! This is not possible to do at this stage because I would need to generate at least 10k samples every now and then
-# 3. Implement EMA to generate better samples  
-    # ? How do I do this? 
 
 if __name__ == "__main__":
 
@@ -326,9 +320,9 @@ if __name__ == "__main__":
 
     train_loop(config, model, noise_scheduler, optimizer, train_dataloader, lr_scheduler, val_dataloader, run_name)#, early_stopper)
     
-    print(f"\n ***** Run EMA model on project {run_name}\n\
+    print(f"\n\nRun EMA model on project {run_name}\n\
         with train size {train_dataset.shape[0]} and val size {valid_dataset.shape[0]}\n \
-        number of epochs {config.num_epochs}")
+        number of epochs {config.num_epochs}\n\n")
     
     torch.cuda.synchronize()
     print(f"Training time: {(time.time() - start_time):.2f} seconds")
