@@ -23,9 +23,9 @@ from torch.utils.tensorboard import SummaryWriter
 # ----------------------
 
 config = utils.TrainingConfig()
-run_name = "full_data_ema_cosbeta_ddim"
+run_name = "full_data_ema_long"
 #run_name = "test1"
-config.num_epochs = 100
+config.num_epochs = 300
 
 
 # For the board
@@ -109,8 +109,8 @@ from pathlib import Path
 
 
 
-#noise_scheduler = DDPMScheduler(num_train_timesteps=1000)
-noise_scheduler = DDPMScheduler(num_train_timesteps=1000, beta_schedule="squaredcos_cap_v2")
+noise_scheduler = DDPMScheduler(num_train_timesteps=1000)
+#noise_scheduler = DDPMScheduler(num_train_timesteps=1000, beta_schedule="squaredcos_cap_v2")
 
 optimizer = torch.optim.AdamW(model.parameters(), lr=config.learning_rate)
 
@@ -255,14 +255,22 @@ def train_loop(config, model, noise_scheduler, optimizer, train_dataloader, lr_s
             ema_model.copy_to(model.parameters())
 
             if (epoch + 1) % config.save_image_epochs == 0 or epoch == config.num_epochs - 1:
-                ddim_scheduler = DDIMScheduler.from_config(noise_scheduler.config) # Added for faster sampling
-                pipeline = DDPMPipeline(unet=accelerator.unwrap_model(model), scheduler=ddim_scheduler)
-                
-                # Defer pipeline creation until needed
-                #pipeline = DDPMPipeline(unet=accelerator.unwrap_model(model), scheduler=noise_scheduler)
-                
-
+                #ddim_scheduler = DDIMScheduler.from_config(noise_scheduler.config) # Added for faster sampling
+                #ddim_scheduler = DDIMScheduler(
+                #                num_train_timesteps=1000,  # Must match the training scheduler
+                #                beta_start=0.0001,         # Match training
+                #                beta_end=0.02,             # Match training
+                #                beta_schedule="linear",  # match training scheduler
+                #                clip_sample=False,
+                #                set_alpha_to_one=False,   # True for DDPM, but False works better for DDIM in many cases
+                #                steps_offset=0)
+                #ddim_scheduler.set_timesteps(num_inference_steps=50)  # Can try 25, 50, 100
+                #pipeline = DDPMPipeline(unet=accelerator.unwrap_model(model), scheduler=ddim_scheduler)
                 # TODO: Add a toggle to evaluate with DDIM
+
+                # Defer pipeline creation until needed
+                pipeline = DDPMPipeline(unet=accelerator.unwrap_model(model), scheduler=noise_scheduler)
+                
                 utils.evaluate(config, epoch, pipeline, run_name)
 
                 # Explicitly delete pipeline to free memory

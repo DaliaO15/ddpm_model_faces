@@ -25,11 +25,11 @@ class TrainingConfig:
     learning_rate = 1e-4
     lr_warmup_steps = 500
     save_image_epochs = 5
-    save_model_epochs = 30
+    save_model_epochs = 30 #previuosuly 20
     mixed_precision = 'fp16'  # `no` for float32, `fp16` for automatic mixed precision
     output_dir = 'ddpm-faces-128'  # the model namy locally and on the HF Hub
     
-    early_stopping_patience = 10
+    early_stopping_patience = 30
     early_stopping_min_delta = 0.0
 
     push_to_hub = False #True  # whether to upload the saved model to the HF Hub
