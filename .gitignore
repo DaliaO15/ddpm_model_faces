@@ -1,3 +1,4 @@
 ddpm-faces-128
 *.ipynb_checkpoints
 __pycache__
+.gradio
