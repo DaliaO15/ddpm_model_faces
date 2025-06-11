@@ -1,6 +1,4 @@
-# ## Training a DDPMS 
-# 
-# I followed this notebook:
+# I followed this notebook for the basic training:
 # https://colab.research.google.com/drive/14Pez9Bs21I6Phw27Byu0jLk23_YFKqNb#scrollTo=1f740dfe-e610-4479-ac30-cce1f9e62553
 
 from datasets import load_dataset
@@ -32,21 +30,21 @@ config.num_epochs = 300
 writer = SummaryWriter(os.path.join(config.output_dir, os.path.join("tensorboard", run_name))) # initate tensorboard
 
 
-# Getting the dataset from HF
+# ------------------ Getting the dataset from HF
 
 config.dataset_name = "HuggingFaceM4/FairFace"
 
-train_dataset = load_dataset(config.dataset_name, "0.25", split="train")
-valid_dataset = load_dataset(config.dataset_name, "0.25", split="validation")
+# Making a small dataset for testing 
 
-# ------------------ Making a small dataset for testing
+#big_valid_dataset = load_dataset(config.dataset_name, "0.25", split="validation") # uncomment for testing
+#small_ds = big_valid_dataset.train_test_split(test_size=0.2,seed=123,stratify_by_column="race",)# uncomment for testing
+#small_ds = small_ds["train"].train_test_split(test_size=0.2,seed=123,stratify_by_column="race",)# uncomment for testing
 
-#small_ds = big_valid_dataset.train_test_split(test_size=0.2,seed=123,stratify_by_column="race",)
-#small_ds = small_ds["train"].train_test_split(test_size=0.2,seed=123,stratify_by_column="race",)
+#train_dataset = small_ds["train"] # uncomment for testing
+#valid_dataset = small_ds["test"] # uncomment for testing
 
-
-#train_dataset = small_ds["train"]
-#valid_dataset = small_ds["test"]
+train_dataset = load_dataset(config.dataset_name, "0.25", split="train") # comment for testing
+valid_dataset = load_dataset(config.dataset_name, "0.25", split="validation") # comment for testing
 
 print(f"The small training dataset has {train_dataset.shape[0]} instances.")
 print(f"The small validation dataset has {valid_dataset.shape[0]} instances.")

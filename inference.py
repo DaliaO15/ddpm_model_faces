@@ -4,7 +4,8 @@ from PIL import Image
 import gradio as gr
 
 # Load the model from your local directory
-pipeline = DDPMPipeline.from_pretrained("ddpm-faces-128/full_data_ema_long/best_model")
+model_path = "ddpm-faces-128/full_data_ema_long/best_model"
+pipeline = DDPMPipeline.from_pretrained(model_path)
 
 # Optional: move to GPU if available
 pipeline = pipeline.to("cuda")
@@ -59,4 +60,4 @@ demo = gr.Interface(
 )
 
 if __name__ == "__main__":
-    demo.launch(server_port=7861, share=True)
+    demo.launch(server_port=7861)
