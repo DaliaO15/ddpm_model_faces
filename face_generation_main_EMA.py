@@ -15,12 +15,13 @@ import torch
 import gc 
 # Import some classes
 import utils
+import config as cf
 # To track the losses 
 from torch.utils.tensorboard import SummaryWriter
 
 # ----------------------
 
-config = utils.TrainingConfig()
+config = cf.TrainingConfig()
 run_name = "full_data_ema_long"
 #run_name = "test1"
 config.num_epochs = 300

@@ -7,10 +7,10 @@ This project implements a Denoising Diffusion Probabilistic Model (DDPM) to gene
 * Trained on a unbiased dataset of human faces (FairFace)
 * Includes:
   * training and evaluation loops
-  * noise scheduling
-  * sampling steps
+  * noise scheduling and sampling steps
   * exponential mean average (EMA) for evaluation and sampling 
   * model monitoring with tensorboards
+  * Inference with Gradio interface
 * Generates diverse and realistic human faces from pure noise
 * Modular and extensible codebase for experimentation
 
@@ -19,14 +19,12 @@ This project implements a Denoising Diffusion Probabilistic Model (DDPM) to gene
 [//]: # (Comment: I need to rework on this)
 
 .
-├── datasets/             # Dataset loading and preprocessing
-├── models/               # U-Net architecture and diffusion model
-├── utils/                # Helper functions (e.g., noise scheduler, image saving)
-├── training.py           # Training loop
-├── sampling.py          # Sampling logic to generate images
-├── config.py             # Configuration for hyperparameters and paths
-├── requirements.txt      # Dependencies
-└── README.md             # Project overview
+├── utils.py              # Helper functions (e.g., noise scheduler, image saving) 
+├── face_generation_main_EMA.py           # Training loop 
+├── inference.py          # Sampling logic to generate images 
+├── config.py             # Configuration for hyperparameters and paths 
+├── environment.yml       # Dependencies 
+└── README.md             # Project overview 
 
 ## If you want to run the code 
 
