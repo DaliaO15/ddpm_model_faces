@@ -18,12 +18,12 @@ This project implements a Denoising Diffusion Probabilistic Model (DDPM) to gene
 
 [//]: # (Comment: I need to rework on this)
 
-.
-├── utils.py              # Helper functions (e.g., noise scheduler, image saving) 
-├── face_generation_main_EMA.py           # Training loop 
-├── inference.py          # Sampling logic to generate images 
-├── config.py             # Configuration for hyperparameters and paths 
-├── environment.yml       # Dependencies 
+. \
+├── utils.py              # Helper functions (e.g., early stopping and sampling) \
+├── face_generation_main_EMA.py           # Training loop \
+├── inference.py          # Sampling logic to generate images \
+├── config.py             # Configuration for hyperparameters and paths \
+├── environment.yml       # Dependencies \
 └── README.md             # Project overview 
 
 ## If you want to run the code 
@@ -38,10 +38,26 @@ cd ddpm_model_faces
 
 [//]: # (Comment: add a env file)
 
+```
+conda env create -f environment.yml
+```
+
 ### 3. Train the model
+
 ```
-python Code/face_generation_main.py
+python face_generation_main_EMA.py
 ```
+
+Considerations:
+
+1. Make sure to change the necessary paths.
+2. The training code tracks the model performance while training. Make sure that you configure tensorboard for this so that you can open the tool in your browser. 
+
+@import "/imgs/tensorboard_exmp.png"
+
+
+![File](/imgs/tensorboard_exmp.png)
+
 [//]: # (Comment: add screenshot of the tensorboard)
 
 ### 4. Generate samples
